@@ -5,20 +5,45 @@ interface Task {
     void someElseMethod();
 }
 
-public class Task1 implements Task {
+class TaskProxy implements Task {
+
+    Task task;
+
+    TaskProxy(Task task) {
+        this.task = task;
+    }
+
+    @Override
     public void someMethod() {
+        doBefore();
+        task.someMethod();
+        doAfter();
+    }
+
+    @Override
+    public void someElseMethod() {
+        doBefore();
+        task.someElseMethod();
+        doAfter();
+    }
+
+    private void doAfter() {
         System.out.println("do Some usual");
         System.out.println("do Some usual1");
-        RefCreator.printOperativeRef();
+    }
+
+    private void doBefore() {
         System.out.println("do Some usual2");
         System.out.println("do Some usual3");
     }
+}
+
+public class Task1 implements Task {
+    public void someMethod() {
+        RefCreator.printOperativeRef();
+    }
     public void someElseMethod() {
-        System.out.println("do Some usual");
-        System.out.println("do Some usual1");
         RefCreator.printHistoricalRef();
-        System.out.println("do Some usual2");
-        System.out.println("do Some usual3");
     }
     static class RefCreator {
         static void printOperativeRef(){
@@ -29,7 +54,7 @@ public class Task1 implements Task {
         }
     }
     public static void main(String[] args) {
-        Task1 refactorTest = new Task1();
+        Task refactorTest = new TaskProxy(new Task1());
         refactorTest.someMethod();
         refactorTest.someElseMethod();
     }
